@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.elliot.device_local_repository">
+    package="mw.elliot.methodchanneltest">
    <application
         android:label="device_local_repository"
         android:icon="@mipmap/ic_launcher">

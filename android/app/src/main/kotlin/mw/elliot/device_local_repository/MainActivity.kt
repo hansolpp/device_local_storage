@@ -1,4 +1,4 @@
-package com.elliot.device_local_repository
+package mw.elliot.methodchanneltest
 
 import io.flutter.embedding.android.FlutterActivity
 
