@@ -1,53 +1,76 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-import 'methodchanneltest.dart';
-
-void main() => runApp(MyApp());
-
-class MyApp extends StatefulWidget {
-  @override
-  _MyAppState createState() => _MyAppState();
+void main() {
+  runApp(const MyApp());
 }
 
-class _MyAppState extends State<MyApp> {
-  // Android로부터 수신한 count값을 저장/출력하기 위한 필드
-  int _count = 0;
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
 
   @override
-  void initState() {
-    super.initState();
-    // MethodChannel 초기화, 요청 수신을 위한 핸들러 등록용
-    Methodchanneltest.initMethodChannel(setCountCallback);
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+    );
   }
+}
 
-  // Android로부터 수신한 count 값을 필드에 반영하기 위한 콜백
-  void setCountCallback(int count) {
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({Key? key, required this.title}) : super(key: key);
+
+  final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  static const platform = MethodChannel('samples.flutter.dev/battery');
+  int _counter = 0;
+
+  void _incrementCounter() {
     setState(() {
-      _count = count;
+      _counter++;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: Center(
-          child: Column(
-            children: <Widget>[
-              RaisedButton(
-                child: Text("getCount"),
-                onPressed: () {
-                  Methodchanneltest.getCount();
-                },
-              ),
-              Text("count: $_count")
-            ],
-          ),
+    return Material(
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            RaisedButton(
+              child: Text('Get Battery Level'),
+              onPressed: _getBatteryLevel,
+            ),
+            Text(_batteryLevel),
+          ],
         ),
       ),
     );
+  }
+
+  // 배터리 레벨을 가져옵니다.
+  String _batteryLevel = 'Unknown battery level.';
+
+  Future<void> _getBatteryLevel() async {
+    String batteryLevel;
+    try {
+      final double result = await platform.invokeMethod('getBatteryLevel');
+      batteryLevel = 'Battery level at $result % .';
+    } on PlatformException catch (e) {
+      batteryLevel = "Failed to get battery level: '${e.message}'.";
+    }
+
+    setState(() {
+      _batteryLevel = batteryLevel;
+    });
   }
 }
